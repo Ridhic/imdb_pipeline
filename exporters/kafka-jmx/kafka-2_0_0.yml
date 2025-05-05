@@ -1,0 +1,42 @@
+---
+startDelaySeconds: 0
+jmxUrl: ""
+username: ""
+password: ""
+ssl: false
+lowercaseOutputName: true
+lowercaseOutputLabelNames: true
+whitelistObjectNames: ["kafka.server:*", "kafka.network:*", "kafka.log:*", "java.lang:*"]
+rules:
+  - pattern: "kafka.server<type=(.+), name=(.+)PerSec, topic=(.+)><>Count"
+    name: kafka_server_$1_$2_per_sec
+    labels:
+      topic: "$3"
+    type: COUNTER
+    help: "Kafka topic $2 per second for $1"
+
+  - pattern: "kafka.server<type=(.+), name=(.+)PerSec><>Count"
+    name: kafka_server_$1_$2_per_sec
+    type: COUNTER
+    help: "Kafka $2 per second for $1"
+
+  - pattern: "kafka.network<type=RequestMetrics, name=RequestsPerSec, request=(.+)><>Count"
+    name: kafka_network_requestmetrics_requests_per_sec
+    labels:
+      request: "$1"
+    type: COUNTER
+    help: "Kafka network request rate for request type"
+
+  - pattern: "java.lang<type=GarbageCollector, name=(.+)><>CollectionCount"
+    name: jvm_gc_collection_count
+    labels:
+      gc_collector: "$1"
+    type: COUNTER
+
+  - pattern: "java.lang<type=Memory, name=HeapMemoryUsage><>used"
+    name: jvm_memory_heap_used_bytes
+    type: GAUGE
+
+  - pattern: "java.lang<type=Threading><>ThreadCount"
+    name: jvm_threads_count
+    type: GAUGE

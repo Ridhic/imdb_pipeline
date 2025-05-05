@@ -1,0 +1,9 @@
+requests
+lxml
+boto3
+psycopg2-binary
+pyspark
+python-dotenv
+kafka-python
+great_expectations
+prometheus-client

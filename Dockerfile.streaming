@@ -1,0 +1,19 @@
+# Dockerfile.streaming
+FROM bitnami/spark:3.5.0-debian-11-r0
+
+# ↳ tell container where Spark lives
+ENV SPARK_HOME=/opt/bitnami/spark
+# ↳ put Spark’s bin/ on the PATH so spark-submit is found
+ENV PATH=$SPARK_HOME/bin:$PATH
+
+# copy your extra connector JARs into Spark’s existing jars folder
+COPY jars/*.jar $SPARK_HOME/jars/
+
+# copy your Python app as the spark user (UID 1001) and make it world-readable
+COPY --chown=1001:0 --chmod=644 spark_streaming_job.py /app/spark_streaming_job.py
+
+WORKDIR /app
+
+RUN pip install prometheus_client
+
+CMD ["/opt/bitnami/spark/bin/spark-submit", "--jars", "/opt/bitnami/spark/jars/spark-sql-kafka-0-10_2.12-3.5.0.jar,/opt/bitnami/spark/jars/kafka-clients-3.5.1.jar", "/app/spark_streaming_job.py"]
